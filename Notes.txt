@@ -1,0 +1,215 @@
+1. the new database for our sql client
+
+CREATE DATABASE database_name;
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
++--------------------+
+5 rows in set (0.03 sec)
+
+mysql> CREATE DATABASE temp1
+    -> ;
+Query OK, 1 row affected (0.29 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| temp1              |
++--------------------+
+6 rows in set (0.10 sec)
+
+mysql> CREATE DATABASE temp2;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| temp1              |
+| temp2              |
++--------------------+
+7 rows in set (0.00 sec)
+
+while creating the database we can make additional parameter in the database and hence that will help us to avoid error
+we can use IF NOT EXIST
+CREATE DATABASE IF NOT EXIST college;
+This is the query which will not give any error if the database is already present in the database but warning will be given to us not error.
+But if the database is not present then it will be created no matter what.
+
+
+2. Deleting the database from the client
+
+DROP DATABASE database_name;
+
+mysql> DROP DATABASE temp2
+    -> ;
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> SHOW DATABASE;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DATABASE' at line 1
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| temp1              |
++--------------------+
+6 rows in set (0.01 sec)
+
+mysql> DROP DATABASE temp1;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+
+while deleting the database from the schema we have to make sure that the database exist in the client
+There we will be using the IF EXIST in the database
+
+DROP DATABASE IF EXIST database_name;
+
+
+3. For selecting the database to work on in the list of databases we have to use the command 'use'
+This use will select the database to work in the environment
+
+USE database_name;
+
+mysql> CREATE DATABASE college;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use DATABASE;
+ERROR 1049 (42000): Unknown database 'database'
+mysql> use college;
+Database changed
+
+
+4. For creating the table in the database we have to first select the database out of the list of database where we have to create the table
+After selecting the database we will create the table in the database using the syntax given below
+
+CREATE TABLE table_name(
+	column_1 datatype constraint, 
+	column_2 datatype constraint, 
+	column_3 datatype constraint
+)
+
+mysql> use college;
+Database changed
+
+mysql> CREATE TABLE student (
+    -> id INT PRIMARY KEY, name VARCHAR(50), age INT NOT NULL);
+Query OK, 0 rows affected (0.22 sec)
+
+For inserting the data into the table we have to make sure that the data and the values in the braces should match with each other
+
+INSERT INTO table_name(column_1, column_2, column_3) VALUES (val1, val2, val3), (val1, val2, val3);
+
+mysql> INSERT INTO student(id, name, age) VALUES (1, "Radhakrushna Mahadik", 22);
+Query OK, 1 row affected (0.07 sec)
+
+mysql> INSERT INTO student (id, name, age) VALUES (2, "Piyush More", 22), (3, "Saurabh Nikam", 23);
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+
+
+For getting the records in the database we can use the SELECT command
+SELECT command will give us the list of all the elements which are present in the mentioned table 
+Syntax :
+	SELECT * FROM table_name;
+
+mysql> SELECT * FROM student;
++----+----------------------+-----+
+| id | name                 | age |
++----+----------------------+-----+
+|  1 | Radhakrushna Mahadik |  22 |
+|  2 | Piyush More          |  22 |
+|  3 | Saurabh Nikam        |  23 |
++----+----------------------+-----+
+3 rows in set (0.02 sec)
+
+
+Datatypes in the MySQL
+
+1. CHAR : It can store string of 0 - 255 
+	But the CHAR is fixed size its size once fixed it cant be changed
+	i.even if we store the values in the database in less than that of what we have declared in the database the memory that might remain will be wasted and we or the server will not be able to utilize that free memory
+
+2. VARCHAR : It is also used to store the string of length 0- 255
+	Advantage of VARCHAR is that the sql server can utilize the free memory left behind after assigning the values to the string
+	i.e even if we declare the values of the database as 255 and we assign the string of length 10 then the remaining values can be accessed by us which is not possible when using the CHAR datatype
+
+BLOB(size):
+	BLOB can be used to store the large binary objects of length larger than that of 1000
+	range :- (0-65535)
+
+INT : It is used to store the integer value in the range of 32 bits
+
+TINYINT : It is used to store in the range (-128 to 127)
+
+
+BIT() : It is used to store the x ammount of bit values
+for eg: BIT(2) here only 2 bit value can be stored
+	We can change the values as per our requirement
+
+
+FLOAT : It is used to store the decimal values of precision upto 23 digits
+
+DOUBLE : It is used to store the FLOAT digits of much higher values
+
+
+BOOLEAN : it is used to store the boolean true or false values
+
+DATE : This is used to get the date in the format of YYYY-MM-DD 
+We can even give it range so that the date will be in particular range only
+
+These numeric datatypes can be signed or unsigned
+When we want increase the range of the numeric datatypes we can make them unsigned
+like range of TINYINT is (-128 to 127) then we can make it unsigned and hence range of the TINYINT will be now increased to (0-255)
+
+
+
+Types of SQL Command: 
+
+1. DDL : Data definition language (Schema of the table)
+2. DML : CRUD operations
+3. DCL : GRANT and REVOKE permissions
+4. TCL : start transaction, commit, rollback
+
+
+We can get the list of all the tables which are present in the given database by using the show table command
+
+SHOW TABLES;
+The out put will be list of all the tables which are present in the table
+
+
+
