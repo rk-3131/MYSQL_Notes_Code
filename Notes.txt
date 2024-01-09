@@ -211,5 +211,357 @@ We can get the list of all the tables which are present in the given database by
 SHOW TABLES;
 The out put will be list of all the tables which are present in the table
 
+If we want to delete the table in the database then it can be done by using the drop command
+
+Syntax : DROP TABLE table_name;
+
+mysql> DROP TABLE student;
+Query OK, 0 rows affected (0.40 sec)
 
 
+When we want to see all the data that is stored in particular table then it can be retrieved by using the Command Select
+SELECT will give us records in the table based on certain condition
+
+Syntax : SELECT * FROM table name;
+here * means every column in the database and not selected columns
+We can get selected columns from the database by specifying particular names of the databases
+
+
+Insert into is used to insert records in the table using commands
+
+Syntax : INSERT INTO table_name (column1. column2, .... columnn) VALUES (v1, v2, ... vn), (v1, v2, ....., vn);
+
+mysql> INSERT INTO student(rollno, name) VALUES (1, "Radhakrushna"), (2, "Saurabh"), (3, "Piyush");
+Query OK, 3 rows affected (0.04 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+We can add the single or even multiple data if we put the data in specific order then we dont have to specify the names of the columns in advance as it will be clear for the insertion
+
+Syntax : INSERT INTO table_name VALUES (v1, v2, ..., vn), (v1, v2, ...., vn);
+
+mysql> INSERT INTO student VALUES (4, "Avi"), (5, "Nachiket"), (6, "Sushant");
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+This method will be prefered for inserting the single row in the table though it can insert multiple records
+This should be preffered for small tables only for larger table first method is well and good
+
+Q: 
+	1.Create a database for your company named XYZ
+	2.Create table to store emp_info (id, name, salary)
+	3.add following information in the db:
+		1, adam, 25000
+		2, bob, 30000
+		3, casey, 40000
+	4.Select and view your table
+
+mysql> CREATE DATABASE IF NOT EXISTS XYZ;
+Query OK, 1 row affected (0.03 sec)
+mysql> USE XYZ IF EXISTS;
+Database changed
+mysql> CREATE TABLE employee_info(id INT PRIMARY KEY, name VARCHAR(55), salary INT NOT NULL);
+Query OK, 0 rows affected (0.11 sec)
+mysql> INSERT INTO employee_info(id, name, salary) VALUES (1, "adam", 25000), (2, "bob", 30000), (3, "casey", 40000);
+Query OK, 3 rows affected (0.03 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM employee_info;
++----+-------+--------+
+| id | name  | salary |
++----+-------+--------+
+|  1 | adam  |  25000 |
+|  2 | bob   |  30000 |
+|  3 | casey |  40000 |
++----+-------+--------+
+3 rows in set (0.01 sec)
+
+Keys: 
+	1. Primary Key:
+		It is column (or group of column) in the table which uniquely identifies each row 
+		It will be unique and not null
+
+	2. Foreign Key: 
+		Foreign key is primary key in another table which is used to make a reference in the current table
+		This is used to have relation between two tables
+		There can be multiple foreign key
+		They can have duplicate and null values
+
+Contraints :
+	They are used to make some specific entry to enter in the database by adding the constraints
+	If we want only certain kind of values to be present in the table then it is possible that contraints will be applied in the database
+
+Syntax : 
+	column_name datatype constraints
+	NOT NULL : This column will not have any null values
+	UNIQUE : This column will have unique values
+	PRIMARY KEY : Make all column values not null and unique
+	FOREIGN KEY : This is the key from another table 
+	This key is used as primary key in other table and it will be referenced from that table so that there will be relation between the tables present in all of the tables mentioned
+
+We know one syntax to define a key as primary key
+There is another way of making one key as primary key
+
+CREATE TABLE student_info(
+	id INT, 
+	name VARCHAR(55), 
+	age INT NOT NULL,
+	PRIMARY KEY(id)
+);
+
+We can even make a combination of keys as primary and foreign based on the presence of keys in the datasets
+
+CREATE TABLE student_info(
+	id INT, 
+	name VARCHAR(55), 
+	age INT NOT NULL,
+	PRIMARY KEY(id, name)
+);
+In the above example we have combination of id and name as the primary key of the dataset
+
+CREATE TABLE temp(
+	cust_id INT, 
+	FOREIGN KEY (cust_id) REFEREBCES customer(id)
+);
+
+mysql> CREATE TABLE temp1(id INT, name VARCHAR(50));
+Query OK, 0 rows affected (0.22 sec)
+
+mysql> CREATE TABLE temp2(cust_id INT, FOREIGN KEY(cust_id) REFERENCES temp1(id));
+ERROR 1822 (HY000): Failed to add the foreign key constraint. Missing index for constraint 'temp2_ibfk_1' in the referenced table 'temp1'
+Here I am getting error as the key id in temp1 is not declared as primary key
+
+DEFAULT : 
+	it is used to set the default value to the dataset
+	Here the value of the default mentioned will be defined while creating the database
+	Hence if we specify the salary constraint then it will be added into the database if we dont specify the inputs while inserting the records
+
+
+mysql> CREATE TABLE temp3 (id INT PRIMARY KEY, salary INT DEFAULT 30000);
+Query OK, 0 rows affected (0.06 sec)
+Here we have created the table where we have made arrangements such that if we dont specify the salary then by default it will be 25000
+
+mysql> INSERT INTO temp3(id, Salary) VALUES(1, 5000);
+Query OK, 1 row affected (0.24 sec)
+Now we have added the salary as 5000 and it is explicitely mentioned hence it will be added to the database
+
+mysql> INSERT INTO temp3(id) VALUES(2);
+Query OK, 1 row affected (0.01 sec)
+In the above query we have not speified in the database about the values about the salary
+This is the time where the default value of the salary is added to the database
+
+mysql> SELECT * FROM temp3;
++----+--------+
+| id | salary |
++----+--------+
+|  1 |   5000 |
+|  2 |  30000 |
++----+--------+
+2 rows in set (0.00 sec)
+
+mysql> CREATE TABLE temp2 (my_id INT, FOREIGN KEY (id) REFERENCES employee_info(id));
+ERROR 1072 (42000): Key column 'id' doesn't exist in table
+mysql> CREATE TABLE temp2 (my_id INT, FOREIGN KEY (my_id) REFERENCES employee_info(id));
+Query OK, 0 rows affected (0.17 sec)
+
+
+CHECK:
+	It is used to define the limits for the values that need to be added to the database
+	Hence CHECK will be used for specifying the range where the values in certain columns can rely on
+
+mysql> CREATE TABLE city(id INT PRIMARY KEY, city VARCHAR(55), age INT, CONSTRAINT age_check CHECK
+    -> (age >= 18 AND city ="Pune"));
+Query OK, 0 rows affected (0.09 sec)
+Here we have created the table where we have specified the constraint about what are limits on the columns age and city
+
+mysql> INSERT INTO city(id, city, age) VALUES (1, "Pune", 20);
+Query OK, 1 row affected (0.01 sec)
+This record has been added as constraint is not violated
+
+mysql> INSERT INTO city(id, city, age) VALUES (1, "Pune", 12);
+ERROR 3819 (HY000): Check constraint 'age_check' is violated.
+mysql> INSERT INTO city(id, city, age) VALUES (1, "Mumbai", 22);
+ERROR 3819 (HY000): Check constraint 'age_check' is violated.
+Here we have got an error as constraint is violated in both of the above cases
+
+
+We can add the check constraint to the table while declaring the table in other way too
+
+mysql> CREATE TABLE temp2 (id INT PRIMARY KEY, age INT CHECK (age >= 18));
+Query OK, 0 rows affected (0.04 sec)
+Here we have specified the constraint in the table at the declaration of the variable also
+
+mysql> INSERT INTO temp2(id, age) VALUES(1, 25);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> INSERT INTO temp2(id, age) VALUES(2, 15);
+ERROR 3819 (HY000): Check constraint 'temp2_chk_1' is violated.
+
+
+SELECT :
+	Select is used to get the results from the table 
+	We can specify the name of the columns in the select command 
+	If we dont specify names of the columns then * can be used to retrieve all the records from the table
+	
+Syntax :
+	SELECT c1, c2, cn FROM table_name;
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    78 | C     | Pune   |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    105 | emanuel |    12 | F     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+
+
+mysql> SELECT name from student;
++---------+
+| name    |
++---------+
+| anil    |
+| bhumika |
+| chetan  |
+| dhruv   |
+| emanuel |
+| farah   |
++---------+
+6 rows in set (0.00 sec)
+
+
+
+If we want to have only unique values from the table then we can use DISTINCT keyword in the SELECT command
+
+SELECT DISTINCT name from students;
+This will give us the unique names from the students table 
+
+mysql> SELECT DISTINCT city from student;
++--------+
+| city   |
++--------+
+| Pune   |
+| Mumbai |
+| Delhi  |
++--------+
+3 rows in set (0.01 sec)
+
+WHERE clause:
+	This is used to add the condition to the select clause
+	It can be used to retrieve the data as per our requirement and hence we can get the results from the data based on the condition that we want to specify
+
+mysql> SELECT * FROM student WHERE marks > 80;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+4 rows in set (0.01 sec)
+This is record of all the students whose marks are greater than that of 80
+
+mysql> SELECT grade FROM student WHERE rollno = 104;
++-------+
+| grade |
++-------+
+| A     |
++-------+
+1 row in set (0.00 sec)
+Here only grade of the student is retrieved whose rollno is 104
+
+mysql> SELECT name FROM student WHERE marks < 90 AND city = "Mumbai";
++--------+
+| name   |
++--------+
+| chetan |
++--------+
+1 row in set (0.00 sec)
+Here we have combined the two condition by using the logical operator
+
+
+Operators : 
+	Atithmetic : +, -, * , /, %
+	Comparison : =, !=, >, <, >=, <=
+	Logical : AND, OR, NOT, IN, BETWEEN, ALL, LIKE, ANY
+	Bitwise : &, |
+
+mysql> SELECT * FROM student where marks + 10 >= 100;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    102 | bhumika |    93 | A     | Mumbai |
+|    104 | dhruv   |    96 | A     | Delhi  |
++--------+---------+-------+-------+--------+
+2 rows in set (0.01 sec)
+
+
+mysql> SELECT * FROM student where marks + 10 >= 100 OR marks + 10 < 100;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    78 | C     | Pune   |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    105 | emanuel |    12 | F     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+
+
+mysql> SELECT * FROM student where marks BETWEEN 80 AND 100;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+4 rows in set (0.00 sec)
+
+
+mysql> SELECT * FROM student WHERE name like 'a%';
++--------+------+-------+-------+------+
+| rollno | name | marks | grade | city |
++--------+------+-------+-------+------+
+|    101 | anil |    78 | C     | Pune |
++--------+------+-------+-------+------+
+1 row in set (0.01 sec)
+
+mysql> SELECT * FROM student WHERE marks IN (100, 25, 85, 98, 92);
++--------+--------+-------+-------+--------+
+| rollno | name   | marks | grade | city   |
++--------+--------+-------+-------+--------+
+|    103 | chetan |    85 | B     | Mumbai |
++--------+--------+-------+-------+--------+
+1 row in set (0.00 sec)
+
+
+AND operator make sure that all the conditions must be true
+
+OR will work if any of the condition is True
+
+BETWEEN is used to get the values in the range 
+BETWEEN 100 AND 200
+Both inclusive
+
+IN is used to get the results from the list provided
+IN (e1, e2, e3, e4, .... en)
+it will give if there is anyting from in
+If we have something in IN then it will check for the rest of elements in IN
+
+NOT is used to negate whole condition
+NOT IN (e1, e2, e3, e4, .... en)
+NOT BETWEEN 100 AND 200
+
+
+
+	
+
+	
