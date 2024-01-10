@@ -561,7 +561,330 @@ NOT IN (e1, e2, e3, e4, .... en)
 NOT BETWEEN 100 AND 200
 
 
+LIMIT: 
+	LIMIT is used to take only limited number of records back as a result from the SELECT section;
+	If we specify LIMIT 5 then only 5 records will be returned if they are more than that otherwise actual number of records will be returned
 
+mysql> SELECT * FROM student LIMIT 3;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    78 | C     | Pune   |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
++--------+---------+-------+-------+--------+
+3 rows in set (0.00 sec)
+
+
+mysql> SELECT * FROM student WHERE marks < 75 LIMIT 5;
++--------+---------+-------+-------+-------+
+| rollno | name    | marks | grade | city  |
++--------+---------+-------+-------+-------+
+|    105 | emanuel |    12 | F     | Delhi |
++--------+---------+-------+-------+-------+
+1 row in set (0.00 sec)
+
+
+ORDER BY:
+	Whenever we want data in the form of increasing and decreasing order then that can be obtained by using the ORDER BY clause 
+	If we specify ASC then data will be in ascending order otherwise the data will be in descending order 
+
+mysql> SELECT * FROM student ORDER BY marks ASC;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    105 | emanuel |    12 | F     | Delhi  |
+|    101 | anil    |    78 | C     | Pune   |
+|    106 | farah   |    82 | B     | Delhi  |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    104 | dhruv   |    96 | A     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+Here we have got the data in the ascending order 
+From low to high
+
+mysql> SELECT * FROM student WHERE marks > 80 ORDER BY marks DESC;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+4 rows in set (0.01 sec)
+Here data is in the form of descending order of all the students who have more than 80 marks 
+
+Lets get the data of top 3 students
+mysql> SELECT * FROM student ORDER BY marks DESC LIMIT 3;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
++--------+---------+-------+-------+--------+
+3 rows in set (0.00 sec)
+
+ORDER BY can be applied to string data as well where the strings will be sorted based on the Alphabetical Order
+
+mysql> SELECT * FROM student ORDER BY city ASC;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    105 | emanuel |    12 | F     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    101 | anil    |    78 | C     | Pune   |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+
+Aggregate Functions:
+	They are used to get the input and then output is given from those function
+	There are different types of aggregate functions
+	1. COUNT() :- Count is a function which will give us the conunt of all the entities that were given as input to that function
+
+	2. MAX() :- Max will give the maximum result out of all the data that has been given as input to the data
+
+	3. MIN() :- Min will give us the minimum result out of all the data that has been given as output to the data
+
+	4. SUM() :- Sum gives us sum of all the input given to the data
+
+	5. AVG() :- avg is used to get the average of all the data
+
+mysql> SELECT COUNT(*) FROM student;
++----------+
+| COUNT(*) |
++----------+
+|        6 |
++----------+
+1 row in set (0.07 sec)
+Getting count of all the students in the dataset
+
+
+mysql> SELECT COUNT(*) as count FROM student WHERE marks > 80;
++-------+
+| count |
++-------+
+|     4 |
++-------+
+1 row in set (0.01 sec)
+Number of all the students who has marks greater than 80
+
+mysql> SELECT SUM(marks) as addition FROM student;
++----------+
+| addition |
++----------+
+|      446 |
++----------+
+1 row in set (0.01 sec)
+Sum of marks of all the students
+
+mysql> SELECT MIN(marks) FROM student;
++------------+
+| MIN(marks) |
++------------+
+|         12 |
++------------+
+1 row in set (0.01 sec)
+Minimum marks of student
+
+mysql> SELECT name FROM student WHERE marks = (SELECT MIN(marks) FROM student);
++---------+
+| name    |
++---------+
+| emanuel |
++---------+
+1 row in set (0.01 sec)
+Name of the student who has lowest marks
+
+mysql> SELECT AVG(marks) FROM student;
++------------+
+| AVG(marks) |
++------------+
+|    74.3333 |
++------------+
+1 row in set (0.00 sec)
+Average of all the marks that every student has got
 	
 
+GROUP BY:
+	This is the clause that is helpful for grouping the rows based on the certain conditions 
+	We can get count or avg or min max of any particular group in the table
+
+Get the minimum marks scored in city Pune
+mysql> SELECT min(marks) FROM student GROUP BY city HAVING CITY = "Pune";
++------------+
+| min(marks) |
++------------+
+|         78 |
++------------+
+1 row in set (0.00 sec)
+
+count the number of students in each city
+
+mysql> SELECT city as CITY, COUNT(*) as Count FROM student GROUP BY city;
++--------+-------+
+| CITY   | Count |
++--------+-------+
+| Pune   |     1 |
+| Mumbai |     2 |
+| Delhi  |     3 |
++--------+-------+
+3 rows in set (0.00 sec)
+
+If we have made the group by name of any column in the table then in SELECT statement we can specify only that column without aggregate function
+If we want to use name of other column in the select statement then we have to make sure that column should be given to make a group by that column name also
+
+SELECT name, city FROM student GROUP BY city;
+This will give error as GROUP BY city has been done and then in SELECT statement name is mentioned 
+name column can only be used here if it is used by the Aggregate function
+
+Find average marks in each of the city
+mysql> SELECT city as City, AVG(marks) as Average FROM student GROUP BY city;
++--------+---------+
+| City   | Average |
++--------+---------+
+| Pune   | 78.0000 |
+| Mumbai | 89.0000 |
+| Delhi  | 63.3333 |
++--------+---------+
+3 rows in set (0.01 sec)
+
+Write a query to find the average marks in each city in ascending order
+
+mysql> SELECT city as City, AVG(marks) as Average FROM student GROUP BY city ORDER BY Average;
++--------+---------+
+| City   | Average |
++--------+---------+
+| Delhi  | 63.3333 |
+| Pune   | 78.0000 |
+| Mumbai | 89.0000 |
++--------+---------+
+3 rows in set (0.01 sec)
+
+For descending
+
+mysql> SELECT city as City, AVG(marks) as Average FROM student GROUP BY city ORDER BY Average DESC;
++--------+---------+
+| City   | Average |
++--------+---------+
+| Mumbai | 89.0000 |
+| Pune   | 78.0000 |
+| Delhi  | 63.3333 |
++--------+---------+
+3 rows in set (0.00 sec)
+
+
+Problem:
 	
+mysql> CREATE TABLE payment (customer_id INT PRIMARY KEY, customer VARCHAR(50), mode VARCHAR(50), city VARCHAR(50));
+Query OK, 0 rows affected (0.34 sec)
+
+mysql> INSERT INTO payment (customer_id, customer, mode, city) VALUES (101, "Olivia Barrett", "Netbanking", "Portland");
+Query OK, 1 row affected (0.05 sec)
+
+mysql> SELECT * FROM payment;
++-------------+----------------+------------+----------+
+| customer_id | customer       | mode       | city     |
++-------------+----------------+------------+----------+
+|         101 | Olivia Barrett | Netbanking | Portland |
++-------------+----------------+------------+----------+
+1 row in set (0.00 sec)
+
+mysql> INSERT INTO payment (customer_id, customer, mode, city) VALUES
+    -> (102, "Ethan Sinclair", "Credit Card", "Miami"),
+    -> (103, "Maya Harnandez", "Credit Card", "Seattle"),
+    -> (104, "Liam Donovan", "Netbanking", "Denver"),
+    -> (105, "Sophia Nguyen", "Credit Card", "New Orleans"),
+    -> (106, "Celeb Foster", "Debit Card", "Minneapolis"),
+    -> (107, "Ava Patel", "Debit Card", "Phoenix"),
+    -> (108, "Lucas Carter", "Netbanking", "Boston"),
+    -> (109, "Isabella Martinez", "Netbanking", "Nashville"),
+    -> (110, "Jackson Brooks", "Credit Card", "Boston");
+Query OK, 9 rows affected (0.02 sec)
+Records: 9  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM payment;
++-------------+-------------------+-------------+-------------+
+| customer_id | customer          | mode        | city        |
++-------------+-------------------+-------------+-------------+
+|         101 | Olivia Barrett    | Netbanking  | Portland    |
+|         102 | Ethan Sinclair    | Credit Card | Miami       |
+|         103 | Maya Harnandez    | Credit Card | Seattle     |
+|         104 | Liam Donovan      | Netbanking  | Denver      |
+|         105 | Sophia Nguyen     | Credit Card | New Orleans |
+|         106 | Celeb Foster      | Debit Card  | Minneapolis |
+|         107 | Ava Patel         | Debit Card  | Phoenix     |
+|         108 | Lucas Carter      | Netbanking  | Boston      |
+|         109 | Isabella Martinez | Netbanking  | Nashville   |
+|         110 | Jackson Brooks    | Credit Card | Boston      |
++-------------+-------------------+-------------+-------------+
+10 rows in set (0.01 sec)
+
+for the given table, find the total payment according to each of the payment method
+
+mysql> SELECT mode as Mode, COUNT(mode) FROM payment GROUP BY mode;
++-------------+-------------+
+| Mode        | COUNT(mode) |
++-------------+-------------+
+| Netbanking  |           4 |
+| Credit Card |           4 |
+| Debit Card  |           2 |
++-------------+-------------+
+3 rows in set (0.01 sec)
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    78 | C     | Pune   |
+|    102 | bhumika |    93 | A     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    104 | dhruv   |    96 | A     | Delhi  |
+|    105 | emanuel |    12 | F     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+
+Find count of each grade in the class
+
+mysql> SELECT grade as Grade, COUNT(name) FROM student GROUP BY grade ORDER BY grade;
++-------+-------------+
+| Grade | COUNT(name) |
++-------+-------------+
+| A     |           2 |
+| B     |           2 |
+| C     |           1 |
+| F     |           1 |
++-------+-------------+
+4 rows in set (0.00 sec)
+
+
+HAVING clause:
+	This is same as WHERE clause 
+	As the WHERE clause is used to apply the condition on normal call HAVING is used to have the condition on the GROUP BY clause
+
+find the number of students in the city where maximum marks in the city are larger than 90
+
+mysql> SELECT city as City, COUNT(name) FROM student GROUP BY city HAVING MAX(marks) > 90;
++--------+-------------+
+| City   | COUNT(name) |
++--------+-------------+
+| Mumbai |           2 |
+| Delhi  |           3 |
++--------+-------------+
+2 rows in set (0.01 sec)
+Here Pune has max marks of 78 which is less than that of 90 hence Pune is not included in here.
+
+GENERAL ORDER OF Writing the columns
+
+SELECT column(s)
+FROM table_name
+WHERE condition
+GROUP BY column(s)
+HAVING condition
+ORDER BY column(s);
