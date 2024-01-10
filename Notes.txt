@@ -1552,14 +1552,359 @@ mysql> SELECT * FROM result;
 +------------+-------+---------+
 2 rows in set (0.00 sec)
 
+mysql> SELECT * FROM student INNER JOIN course ON student.student_id = course.student_id;
++------------+-------+------------+---------+
+| student_id | name  | student_id | course  |
++------------+-------+------------+---------+
+|        102 | bob   |        102 | english |
+|        103 | casey |        103 | science |
++------------+-------+------------+---------+
+2 rows in set (0.00 sec)
+Here we have joined the two tables student and courses which will be used to get common records in both the tables
+Now we will get the student_id, name and course column from the two tables 
+
+mysql> SELECT s.student_id, s.name, c.course FROM student as s JOIN course as c ON s.student_id = c.student_id;
++------------+-------+---------+
+| student_id | name  | course  |
++------------+-------+---------+
+|        102 | bob   | english |
+|        103 | casey | science |
++------------+-------+---------+
+2 rows in set (0.00 sec)
+
 
 Left Join:
 	It will return all the data from the left table and matching data from the right table
 	Data from either left or common of left and right
+mysql> SELECT s.student_id, s.name, c.course
+    -> FROM student as s
+    -> LEFT JOIN course as c
+    -> ON s.student_id = c.student_id;
++------------+-------+---------+
+| student_id | name  | course  |
++------------+-------+---------+
+|        101 | adam  | NULL    |
+|        102 | bob   | english |
+|        103 | casey | science |
++------------+-------+---------+
+3 rows in set (0.00 sec)
+Here all the records from the left table are returned in the results and only matched records in the other table are returned
+If there is no matching record for the left in the right then that is returned as null like adam has null course
 
 Right Join:
 	This will return matching data from the left table and all the data from the rigt table
 	Data from the right or common data from right and left
 
+mysql> SELECT c.student_id, c.course, s.name
+    -> FROM student as s
+    -> RIGHT JOIN course as c
+    -> ON s.student_id = c.student_id;
++------------+------------------+-------+
+| student_id | course           | name  |
++------------+------------------+-------+
+|        102 | english          | bob   |
+|        103 | science          | casey |
+|        105 | math             | NULL  |
+|        107 | computer science | NULL  |
++------------+------------------+-------+
+4 rows in set (0.00 sec)
+
+Here all the data from the right table is returned with the matching data from the left table
+If matching data from the left table is not found then null is returned
+	
+
 Full Join:
 	This will return all the records from both of the tables 
+	Getting result in the form of FULL JOIN is not directly possible by use of MYSQL directly
+	But we can use the concept of left join and union it with the right join then it can be possible to have a join of the statement
+
+mysql> SELECT s.student_id, s.name, c.student_id as c_student_id, c.course
+    -> FROM student as s
+    -> LEFT JOIN course as c
+    -> on s.student_id = c.student_id
+    -> UNION
+    -> SELECT s.student_id, s.name, c.student_id as c_student_id, c.course
+    -> FROM student as s
+    -> RIGHT JOIN course as c
+    -> ON s.student_id = s.student_id;
++------------+-------+--------------+------------------+
+| student_id | name  | c_student_id | course           |
++------------+-------+--------------+------------------+
+|        101 | adam  |         NULL | NULL             |
+|        102 | bob   |          102 | english          |
+|        103 | casey |          103 | science          |
+|        103 | casey |          102 | english          |
+|        101 | adam  |          102 | english          |
+|        102 | bob   |          103 | science          |
+|        101 | adam  |          103 | science          |
+|        103 | casey |          105 | math             |
+|        102 | bob   |          105 | math             |
+|        101 | adam  |          105 | math             |
+|        103 | casey |          107 | computer science |
+|        102 | bob   |          107 | computer science |
+|        101 | adam  |          107 | computer science |
++------------+-------+--------------+------------------+
+13 rows in set (0.08 sec)
+
+mysql> SELECT * FROM student as s
+    -> LEFT JOIN
+    -> course as c
+    -> ON s.student_id = c.student_id
+    -> UNION
+    -> SELECT * FROM student as s
+    -> RIGHT JOIN
+    -> course as c
+    -> ON s.student_id = c.student_id;
++------------+-------+------------+------------------+
+| student_id | name  | student_id | course           |
++------------+-------+------------+------------------+
+|        101 | adam  |       NULL | NULL             |
+|        102 | bob   |        102 | english          |
+|        103 | casey |        103 | science          |
+|       NULL | NULL  |        105 | math             |
+|       NULL | NULL  |        107 | computer science |
++------------+-------+------------+------------------+
+5 rows in set (0.00 sec)
+
+There are another two types of join which might be asked in the interview
+
+LEFT EXCLUSIVE JOIN:
+Here all the data from the left table is taken into the output but the data that is common between left and right is not taken
+i.e Only data that is exclusive to left table is taken
+and the way to take this data is by making sure that the right table's data is null in that section
+
+mysql> SELECT * FROM student
+    -> LEFT JOIN course
+    -> ON student.student_id = course.student_id
+    -> WHERE course.student_id IS NULL;
++------------+------+------------+--------+
+| student_id | name | student_id | course |
++------------+------+------------+--------+
+|        101 | adam |       NULL | NULL   |
++------------+------+------------+--------+
+1 row in set (0.01 sec)
+
+Here this is data that is only limited to the left table and not to both of the table
+
+RIGHT EXCLUSIVE JOIN:
+mysql> SELECT * FROM student
+    -> RIGHT JOIN course
+    -> ON student.student_id = course.student_id
+    -> WHERE student.student_id is NULL;
++------------+------+------------+------------------+
+| student_id | name | student_id | course           |
++------------+------+------------+------------------+
+|       NULL | NULL |        105 | math             |
+|       NULL | NULL |        107 | computer science |
++------------+------+------------+------------------+
+2 rows in set (0.00 sec)
+
+
+FULL EXCLUSIVE JOIN
+
+mysql> SELECT * FROM student as s
+    -> LEFT JOIN course as c
+    -> on s.student_id = c.student_id
+    -> WHERE c.student_id IS NULL
+    -> UNION
+    -> SELECT * FROM student as s
+    -> RIGHT JOIN course as c
+    -> ON s.student_id = c.student_id
+    -> WHERE s.student_id IS NULL;
++------------+------+------------+------------------+
+| student_id | name | student_id | course           |
++------------+------+------------+------------------+
+|        101 | adam |       NULL | NULL             |
+|       NULL | NULL |        105 | math             |
+|       NULL | NULL |        107 | computer science |
++------------+------+------------+------------------+
+
+It is the part in only A and B only
+
+SELF JOIN:
+	It is inner join but instead of joining the two tables it is used to join the table itself
+
+
+UNION:
+	It is used to combine all the elements from both the tables and duplicate entries will be removed
+	Rule:
+		1. Every select should have same number of column
+		2. Columns must have simillar data types
+		3. Columns in every SELECT should be in same order
+
+mysql> SELECT student_id FROM student
+    -> UNION
+    -> SELECT student_id FROM course;
++------------+
+| student_id |
++------------+
+|        101 |
+|        102 |
+|        103 |
+|        105 |
+|        107 |
++------------+
+5 rows in set (0.01 sec)
+
+UNION ALL is same as UNION but it does not remove the duplicate values
+
+SUBQUERIES:
+	They can be written in 
+			1. SELECT
+			2. FROM
+			3. WHERE
+
+SELECT column(s)
+FROM table_name
+WHERE col_name operator (subquery);
+
+
+mysql> SELECT * FROM stud;
++--------+---------+-------+
+| rollno | name    | marks |
++--------+---------+-------+
+|    101 | anil    | 75    |
+|    102 | bhumika | 93    |
+|    103 | chetan  | 85    |
+|    104 | dhruv   | 96    |
+|    105 | emanuel | 92    |
+|    106 | farah   | 82    |
++--------+---------+-------+
+6 rows in set (0.00 sec)
+
+Get names of all student who scored more than average of the class
+
+mysql> SELECT name from stud WHERE
+    -> marks >
+    -> (SELECT avg(marks) FROM stud);
++---------+
+| name    |
++---------+
+| bhumika |
+| dhruv   |
+| emanuel |
++---------+
+3 rows in set (0.02 sec)
+
+mysql> SELECT name, marks from stud WHERE
+    -> marks >
+    -> (SELECT avg(marks) FROM stud);
++---------+-------+
+| name    | marks |
++---------+-------+
+| bhumika | 93    |
+| dhruv   | 96    |
+| emanuel | 92    |
++---------+-------+
+3 rows in set (0.00 sec)
+
+Example: 
+	Find the names of all the students with even roll numbers
+
+mysql> SELECT rollno, name FROM stud
+    -> WHERE rollno % 2 = 0;
++--------+---------+
+| rollno | name    |
++--------+---------+
+|    102 | bhumika |
+|    104 | dhruv   |
+|    106 | farah   |
++--------+---------+
+3 rows in set (0.01 sec)
+
+		OR
+
+mysql> SELECT rollno, name FROM stud
+    -> WHERE rollno IN (
+    -> SELECT rollno FROM stud WHERE rollno % 2 = 0);
++--------+---------+
+| rollno | name    |
++--------+---------+
+|    102 | bhumika |
+|    104 | dhruv   |
+|    106 | farah   |
++--------+---------+
+
+
+
+While using the subquery we have to use the alias to the final table
+
+mysql> SELECT MAX(marks) FROM
+    -> (SELECT marks FROM stud WHERE rollno IN(101, 102, 103, 104)) AS temp;
++------------+
+| MAX(marks) |
++------------+
+| 96         |
++------------+
+1 row in set (0.01 sec)
+
+Using subquery in SELECT
+
+
+mysql> SELECT name, marks, (SELECT avg(marks) FROM stud) as avg FROM stud;
++---------+-------+-------------------+
+| name    | marks | avg               |
++---------+-------+-------------------+
+| anil    | 75    | 87.16666666666667 |
+| bhumika | 93    | 87.16666666666667 |
+| chetan  | 85    | 87.16666666666667 |
+| dhruv   | 96    | 87.16666666666667 |
+| emanuel | 92    | 87.16666666666667 |
+| farah   | 82    | 87.16666666666667 |
++---------+-------+-------------------+
+6 rows in set (0.00 sec)
+
+
+MySQL views
+	These are virtual table	
+	
+	Syntax :
+CREATE VIEW view1 as 
+SELECT rollno, name FROM stud;
+
+SELECT * FROM view1;
+
+It can be used for protecting the data from unauthorized user
+Like marketing team wont have acces to code and they can acces only data that has to be given
+
+And then that person can create operation on the data that is present
+
+
+mysql> SELECT * FROM stud;
++--------+---------+-------+
+| rollno | name    | marks |
++--------+---------+-------+
+|    101 | anil    | 75    |
+|    102 | bhumika | 93    |
+|    103 | chetan  | 85    |
+|    104 | dhruv   | 96    |
+|    105 | emanuel | 92    |
+|    106 | farah   | 82    |
++--------+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> CREATE VIEW view1 as
+    -> SELECT rollno, name FROM stud;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> SELECT * FROM view1;
++--------+---------+
+| rollno | name    |
++--------+---------+
+|    101 | anil    |
+|    102 | bhumika |
+|    103 | chetan  |
+|    104 | dhruv   |
+|    105 | emanuel |
+|    106 | farah   |
++--------+---------+
+6 rows in set (0.01 sec)
+
+mysql> DROP VIEW view1;
+Query OK, 0 rows affected (0.02 sec)
+
+
+
+
+	
+
