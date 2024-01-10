@@ -888,3 +888,678 @@ WHERE condition
 GROUP BY column(s)
 HAVING condition
 ORDER BY column(s);
+
+UPDATE operations:
+	Existing data in the row can be updated using this clause
+
+Syntax: 	
+	UPDATE table_name SET col1 = val1, col2 = val2 WHERE condition
+
+mysql> UPDATE student SET grade = "O" WHERE grade = "A";
+Query OK, 2 rows affected (0.11 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    78 | C     | Pune   |
+|    102 | bhumika |    93 | O     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    104 | dhruv   |    96 | O     | Delhi  |
+|    105 | emanuel |    12 | F     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+
+Here we have updated the table using the update command where we have made the grade of student as 'O' who had got the grade as 'A'
+UPDATE table_name SET c1 = v1, c2 = v2 WHERE condition;
+
+Sometimes the mysql server can be in the safe mode
+Whenever the safe mode is ON we will not be able to Modify any update in the documentation
+Syntax to enable or disable the safe mode is
+SET SQL_SAFE_UPDATES = 0;  //Disable
+SET SQL_SAFE_UPDATES = 1;  //Enable
+
+updates the marks of student who has marks of 12 to 72
+mysql> UPDATE student SET marks = 72 WHERE rollno = 105;
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    78 | C     | Pune   |
+|    102 | bhumika |    93 | O     | Mumbai |
+|    103 | chetan  |    85 | B     | Mumbai |
+|    104 | dhruv   |    96 | O     | Delhi  |
+|    105 | emanuel |    72 | F     | Delhi  |
+|    106 | farah   |    82 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+
+Now suppose we want to increament the marks of each of the student by 1
+At that time we have to make sure that the student's marks must be updated in every row
+
+mysql> UPDATE student SET marks = marks + 1;
+Query OK, 6 rows affected (0.02 sec)
+Rows matched: 6  Changed: 6  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    105 | emanuel |    83 | B     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.01 sec)
+
+
+DELETE clause:
+	Delete is used to delete the rows or records from the database
+	If we dont specify any condition then delete operation will delete the whole set of rows
+	So we have to make sure that we use correct condition to delete the row
+
+Syntax:
+	DELETE FROM table_name WHERER condition;
+
+Lets delete the records of student who has scored marks less than 33;
+mysql> DELETE FROM student WHERE marks < 33;
+Query OK, 0 rows affected (0.01 sec)
+
+
+Now lets update the marks of 105 with 12 again and then delete the record from the table
+
+mysql> UPDATE student SET marks = 12 WHERE rollno = 105;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> UPDATE student SET grade = "F" WHERE marks < 33;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    105 | emanuel |    12 | F     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+6 rows in set (0.00 sec)
+
+mysql> DELETE FROM student WHERE marks < 33;
+Query OK, 1 row affected (0.02 sec)
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+
+Revisiting foreign key
+
+mysql> CREATE TABLE course(id INT PRIMARY KEY, name VARCHAR(50));
+Query OK, 0 rows affected (0.47 sec)
+
+mysql> CREATE TABLE teacher (id INT PRIMARY KEY, name VARCHAR(50), dept_id INT,
+    -> FOREIGN KEY(dept_id) REFERENCES course(id));
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> INSERT INTO course(id, name) VALUES
+    -> (101, "Science").
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '.' at line 2
+mysql> INSERT INTO course(id, name) VALUES
+    -> (101, "Science"),
+    -> (102, "English"),
+    -> (103, "Hindi");
+Query OK, 3 rows affected (0.02 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO teacher(id, name, dept_id) VALUES
+    -> (101, "Adam", 101),
+    -> (102, "Bob", 103),
+    -> (103, "Casey", 102),
+    -> (104, "Donald", 102);
+Query OK, 4 rows affected (0.04 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM course;
++-----+---------+
+| id  | name    |
++-----+---------+
+| 101 | Science |
+| 102 | English |
+| 103 | Hindi   |
++-----+---------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM teacher;
++-----+--------+---------+
+| id  | name   | dept_id |
++-----+--------+---------+
+| 101 | Adam   |     101 |
+| 102 | Bob    |     103 |
+| 103 | Casey  |     102 |
+| 104 | Donald |     102 |
++-----+--------+---------+
+4 rows in set (0.00 sec)
+
+The table whose PRIMARY KEY is used in other table is called as parent table 
+The table in which PRIMARY KEY of other table is used as FOREIGN KEY is called as child table
+
+
+Now as we have seen that there is relationship between the parent and child table hence there has to be a mechanism if there is any change in the parent table or deletion in the child table then changes should be reflected back to the child table
+
+This mechanism is called as CASCADING
+
+If we specify the option of ON DELETE CASCADE and ON UPDATE CASCADE in the child table then all the changes in the parent table or updation in the parent table will also be reflected back to the child table as well
+
+Lets apply this in code
+
+mysql> DROP table teacher;
+Query OK, 0 rows affected (0.15 sec)
+
+mysql> DROP table course;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_college |
++-------------------+
+| payment           |
+| student           |
++-------------------+
+2 rows in set (0.01 sec)
+
+mysql> CREATE TABLE department(id INT PRIMARY KEY, name VARCHAR(50));
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> CREATE TABLE teacher(id INT PRIMARY KEY, name VARCHAR(50), dept_id INT,
+    -> FOREIGN KEY (dept_id) REFERENCES department(id)
+    -> ON DELETE CASCADE
+    -> ON UPDATE CASCADE);
+Query OK, 0 rows affected (0.13 sec)
+
+
+mysql> INSERT INTO department(id, name) VALUES
+    -> (101, "Science"),
+    -> (102, "English"),
+    -> (103, "Hindi");
+Query OK, 3 rows affected (0.03 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO teacher (id, name, dept_id) VALUES
+    -> (101, "Adam", 101),
+    -> (102, "Bob", 103),
+    -> (103, "Casey", 102),
+    -> (104, "Donald", 102);
+Query OK, 4 rows affected (0.02 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT * FROM department;
++-----+---------+
+| id  | name    |
++-----+---------+
+| 101 | Science |
+| 102 | English |
+| 103 | Hindi   |
++-----+---------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM teacher;
++-----+--------+---------+
+| id  | name   | dept_id |
++-----+--------+---------+
+| 101 | Adam   |     101 |
+| 102 | Bob    |     103 |
+| 103 | Casey  |     102 |
+| 104 | Donald |     102 |
++-----+--------+---------+
+4 rows in set (0.00 sec)
+
+mysql> DELETE FROM department WHERE id = 103;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM department;
++-----+---------+
+| id  | name    |
++-----+---------+
+| 101 | Science |
+| 102 | English |
++-----+---------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM teacher;
++-----+--------+---------+
+| id  | name   | dept_id |
++-----+--------+---------+
+| 101 | Adam   |     101 |
+| 103 | Casey  |     102 |
+| 104 | Donald |     102 |
++-----+--------+---------+
+3 rows in set (0.00 sec)
+
+Here after deleting the records in the parent table we have also seen the records are being deleted in the child table also
+
+
+mysql> UPDATE department SET id = 104 WHERE name = "Science";
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM department;
++-----+---------+
+| id  | name    |
++-----+---------+
+| 102 | English |
+| 104 | Science |
++-----+---------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM teacher;
++-----+--------+---------+
+| id  | name   | dept_id |
++-----+--------+---------+
+| 101 | Adam   |     104 |
+| 103 | Casey  |     102 |
+| 104 | Donald |     102 |
++-----+--------+---------+
+3 rows in set (0.00 sec)
+
+Here in the above code example we have updated the code such that id changes in the parent table are now visible in the child table as well
+
+ALTER command
+
+ALTER is used to make changes in the table structure directly
+Hence it can be included in the DDL list of commands
+
+It can be used to add a column
+It can be used to delete a column, rename the table and also to add a primary or a foreign key
+
+//Add Column
+ALTER TABLE table_name
+ADD COLUMN column_name datatype Contsraints
+
+mysql> ALTER TABLE student ADD COLUMN age INT NOT NULL;
+Query OK, 0 rows affected (0.14 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+-----+
+| rollno | name    | marks | grade | city   | age |
++--------+---------+-------+-------+--------+-----+
+|    101 | anil    |    79 | C     | Pune   |   0 |
+|    102 | bhumika |    94 | O     | Mumbai |   0 |
+|    103 | chetan  |    86 | B     | Mumbai |   0 |
+|    104 | dhruv   |    97 | O     | Delhi  |   0 |
+|    106 | farah   |    83 | B     | Delhi  |   0 |
++--------+---------+-------+-------+--------+-----+
+5 rows in set (0.00 sec)
+
+mysql> UPDATE student SET AGE = 22;
+Query OK, 5 rows affected (0.01 sec)
+Rows matched: 5  Changed: 5  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+-----+
+| rollno | name    | marks | grade | city   | age |
++--------+---------+-------+-------+--------+-----+
+|    101 | anil    |    79 | C     | Pune   |  22 |
+|    102 | bhumika |    94 | O     | Mumbai |  22 |
+|    103 | chetan  |    86 | B     | Mumbai |  22 |
+|    104 | dhruv   |    97 | O     | Delhi  |  22 |
+|    106 | farah   |    83 | B     | Delhi  |  22 |
++--------+---------+-------+-------+--------+-----+
+5 rows in set (0.00 sec)
+
+
+DROPPING THE COLUMNS
+
+mysql> ALTER TABLE student DROP COLUMN age;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+
+RENAMING THE TABLE
+
+mysql> ALTER TABLE student RENAME TO Vidyarthi;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> SELECT * FROM Vidyarhi;
+ERROR 1146 (42S02): Table 'college.vidyarhi' doesn't exist
+mysql> SELECT * FROM Vidyarthi;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | city   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.01 sec)
+
+mysql> ALTER TABLE Vidyarthi RENAME TO student;
+Query OK, 0 rows affected (0.05 sec)
+
+We can even make changes in the name and datatype of the column too
+
+ALTER TABLE table_name
+CHANGE COLUMN old_name new_name new_datatype new_constraints
+mysql> ALTER TABLE student CHANGE COLUMN city Shahar VARCHAR(50);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | Shahar |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+
+// we can modify the columns too
+ALTER TABLE table_name
+MODIFY col_name new_datatype new_constraint
+
+mysql> ALTER TABLE student MODIFY Shahar VARCHAR(50) NOT NULL;
+Query OK, 0 rows affected (0.23 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | Shahar |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+Change the name of the column back to city
+mysql> ALTER TABLE student CHANGE COLUMN Shahar City VARCHAR(50) NOT NULL;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | City   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+We can also see that name of the tables are not case sensitive 
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | City   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | City   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT * FROM STUDENT;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | City   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+mysql> ALTER TABLE student RENAME TO Student;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_college |
++-------------------+
+| department        |
+| payment           |
+| student           |
+| teacher           |
++-------------------+
+4 rows in set (0.00 sec)
+
+ALTER changes schema hence it is called as DDL
+
+TRUNCATE :
+	It is used to delete all the data in the table
+	DROP deletes the whole table
+	TRUNCATE removes all the data in the table but table's schema will be as it is
+
+Syntax :
+	TRUNCATE TABLE table_name;
+
+Here data from the teacher table can be seen and after truncating the table whole data will go empty
+But the table will be there and its schema will also be there
+
+mysql> SELECT * FROM teacher;
++-----+--------+---------+
+| id  | name   | dept_id |
++-----+--------+---------+
+| 101 | Adam   |     104 |
+| 103 | Casey  |     102 |
+| 104 | Donald |     102 |
++-----+--------+---------+
+3 rows in set (0.00 sec)
+
+mysql> TRUNCATE TABLE teacher;
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> SELECT * FROM teacher;
+Empty set (0.00 sec)
+
+Practice Question:
+1. Change the name of the column from name to full_name in student table
+2. Delete all the students who scored marks less than 80
+3. Delete the column grades
+
+mysql> SELECT * FROM student;
++--------+---------+-------+-------+--------+
+| rollno | name    | marks | grade | City   |
++--------+---------+-------+-------+--------+
+|    101 | anil    |    79 | C     | Pune   |
+|    102 | bhumika |    94 | O     | Mumbai |
+|    103 | chetan  |    86 | B     | Mumbai |
+|    104 | dhruv   |    97 | O     | Delhi  |
+|    106 | farah   |    83 | B     | Delhi  |
++--------+---------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+mysql> ALTER TABLE Student CHANGE name full_name VARCHAR(50);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+-----------+-------+-------+--------+
+| rollno | full_name | marks | grade | City   |
++--------+-----------+-------+-------+--------+
+|    101 | anil      |    79 | C     | Pune   |
+|    102 | bhumika   |    94 | O     | Mumbai |
+|    103 | chetan    |    86 | B     | Mumbai |
+|    104 | dhruv     |    97 | O     | Delhi  |
+|    106 | farah     |    83 | B     | Delhi  |
++--------+-----------+-------+-------+--------+
+5 rows in set (0.00 sec)
+
+
+mysql> DELETE FROM student WHERE marks < 80;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> ALTER TABLE student DROP COLUMN grade;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++--------+-----------+-------+--------+
+| rollno | full_name | marks | City   |
++--------+-----------+-------+--------+
+|    102 | bhumika   |    94 | Mumbai |
+|    103 | chetan    |    86 | Mumbai |
+|    104 | dhruv     |    97 | Delhi  |
+|    106 | farah     |    83 | Delhi  |
++--------+-----------+-------+--------+
+4 rows in set (0.00 sec)
+
+JOINS IN SQL
+Joins are used to combine the result in the two table based on the common columns in the two tables
+Joins can also be prepared by using Foreign key but it is not neccessary to have it 
+Only thing that is needed is that both of those tables must contain the common column in the table
+
+INNER JOIN:
+	This will return the common data in both the tables
+	Interchange in the names of the table is possible and it will give us the same result no matter what in the database
+	But it can't be possible to interchange the names of tables in left or right join
+	
+Syntax:
+SELECT column(s)
+FROM tableA
+INNER JOIN tableB
+ON tableA.col_name = tableB.col_name;
+
+mysql> ALTER TABLE student RENAME TO stud;
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> CREATE TABLE student (student_id INT PRIMARY KEY, name VARCHAR(50));
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> INSERT INTO student(student_id, name) VALUES
+    -> (101, "adam"),
+    -> (102, "bob"),
+    -> (103, "casey");
+Query OK, 3 rows affected (0.02 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE course(student_id INT PRIMARY KEY, course VARCHAR(50));
+Query OK, 0 rows affected (0.16 sec)
+
+mysql> INSERT INTO course(student_id, course) VALUES
+    -> (102, "english"),
+    -> (105, "math"),
+    -> (103, "science"),
+    -> (107, "computer science");
+Query OK, 4 rows affected (0.02 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE result (student_id INT PRIMARY KEY, name VARCHAR(50), course VARCHAR(50));
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> INSERT INTO result(student_id, name, course) VALUES
+    -> (102, "bob", "english"),
+    -> (103, "casey", "science");
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM student;
++------------+-------+
+| student_id | name  |
++------------+-------+
+|        101 | adam  |
+|        102 | bob   |
+|        103 | casey |
++------------+-------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM course;
++------------+------------------+
+| student_id | course           |
++------------+------------------+
+|        102 | english          |
+|        103 | science          |
+|        105 | math             |
+|        107 | computer science |
++------------+------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM result;
++------------+-------+---------+
+| student_id | name  | course  |
++------------+-------+---------+
+|        102 | bob   | english |
+|        103 | casey | science |
++------------+-------+---------+
+2 rows in set (0.00 sec)
+
+
+Left Join:
+	It will return all the data from the left table and matching data from the right table
+	Data from either left or common of left and right
+
+Right Join:
+	This will return matching data from the left table and all the data from the rigt table
+	Data from the right or common data from right and left
+
+Full Join:
+	This will return all the records from both of the tables 
